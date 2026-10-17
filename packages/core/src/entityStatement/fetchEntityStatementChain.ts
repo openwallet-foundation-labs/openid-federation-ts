@@ -1,13 +1,14 @@
 import type { EntityConfigurationClaims } from '../entityConfiguration'
 import { OpenIdFederationError } from '../error/OpenIdFederationError'
 import { PolicyErrorStage } from '../error/PolicyErrorStage'
-import type { VerifyCallback } from '../utils'
+import type { FetchCallback, VerifyCallback } from '../utils'
 import type { EntityStatementClaims } from './entityStatementClaims'
 import { fetchEntityStatement } from './fetchEntityStatement'
 
 export type FetchEntityStatementChainOptions = {
   entityConfigurations: Array<EntityConfigurationClaims>
   verifyJwtCallback: VerifyCallback
+  fetchCallback?: FetchCallback
 }
 
 export type EntityStatementChain = Array<EntityStatementClaims>
@@ -15,6 +16,7 @@ export type EntityStatementChain = Array<EntityStatementClaims>
 export const fetchEntityStatementChain = async ({
   verifyJwtCallback,
   entityConfigurations,
+  fetchCallback,
 }: FetchEntityStatementChainOptions): Promise<EntityStatementChain> => {
   if (entityConfigurations.length === 0) {
     throw new OpenIdFederationError(
@@ -55,6 +57,7 @@ export const fetchEntityStatementChain = async ({
         iss: configuration.iss,
         sub: subjectConfiguration.sub,
         issEntityConfiguration: configuration,
+        fetchCallback,
       })
     )
   }

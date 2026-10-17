@@ -1,6 +1,7 @@
 export * from './constraints'
 export * from './entityConfiguration'
 export * from './entityStatement'
+export * from './error'
 export * from './resolveTrustChains'
 export * from './jsonWeb'
 export * from './metadata'

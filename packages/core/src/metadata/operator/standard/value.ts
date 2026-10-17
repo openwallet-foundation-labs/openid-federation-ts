@@ -20,7 +20,7 @@ export const valueOperator = createPolicyOperatorSchema({
     z.array(z.unknown()),
     z.null(),
   ],
-  canBeCombinedWith: ['essential'],
+  canBeCombinedWith: ['add', 'default', 'one_of', 'subset_of', 'superset_of', 'essential'],
   orderOfApplication: MetadataOrderOfApplication.First,
   mergeStrategy: MetadataMergeStrategy.OperatorValuesEqual,
 })

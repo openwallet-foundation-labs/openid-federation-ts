@@ -1,5 +1,7 @@
+import { OpenIdFederationError } from '../error/OpenIdFederationError'
+import { PolicyErrorStage } from '../error/PolicyErrorStage'
 import { verifyJwtSignature } from '../jsonWeb/verifyJsonWebToken'
-import { type FetchCallback, type VerifyCallback, addPaths, fetcher } from '../utils'
+import { type FetchCallback, type VerifyCallback, addPaths, fetcher, isSameEntityId } from '../utils'
 import { validate } from '../utils/validate'
 import { entityConfigurationJwtSchema } from './entityConfigurationJwt'
 
@@ -35,6 +37,14 @@ export const fetchEntityConfiguration = async ({
     data: entityConfigurationJwt,
     errorMessage: 'fetched entity configuration JWT is invalid',
   })
+
+  // The entity configuration must be about the requested entity, otherwise any URL could claim to be another entity
+  if (!isSameEntityId(claims.sub, entityId)) {
+    throw new OpenIdFederationError(
+      PolicyErrorStage.Validation,
+      `entity configuration fetched for '${entityId}' has subject '${claims.sub}'`
+    )
+  }
 
   await verifyJwtSignature({ jwt: entityConfigurationJwt, verifyJwtCallback })
 

@@ -42,3 +42,11 @@ export const addSearchParams = (baseUrl: string, searchParams: URLSearchParams |
   baseUrl.endsWith('?')
     ? `${baseUrl}${searchParams instanceof URLSearchParams ? searchParams : new URLSearchParams(searchParams)}`
     : `${baseUrl}?${searchParams instanceof URLSearchParams ? searchParams : new URLSearchParams(searchParams)}`
+
+/**
+ *
+ * Compares two entity identifiers as Section 16 requires: code point by code point. A trailing slash is only removed
+ * when building the well-known URL.
+ *
+ */
+export const isSameEntityId = (a: string, b: string) => a === b

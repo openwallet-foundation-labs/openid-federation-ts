@@ -21,7 +21,7 @@ export function combineExistingMetadataPolicyOperators({
     // When we don't know the policy key we can skip it because we already know it's not critical
     if (!isExistingPolicyKey(policyPropertyKey)) continue
 
-    if (!combinedPolicyRules[policyPropertyKey]) {
+    if (combinedPolicyRules[policyPropertyKey] === undefined) {
       combinedPolicyRules[policyPropertyKey] = policyRuleValue
       continue
     }
@@ -71,7 +71,8 @@ export function combineExistingMetadataPolicyOperators({
 
         combinedPolicyRules[policyPropertyKey] = union(existingPolicyRuleValue, newPolicyRuleValue)
         break
-      case MetadataMergeStrategy.Intersection: {
+      case MetadataMergeStrategy.Intersection:
+      case MetadataMergeStrategy.IntersectionMayBeEmpty: {
         if (!Array.isArray(existingPolicyRuleValue) || !Array.isArray(newPolicyRuleValue)) {
           throw new PolicyOperatorMergeError('Existing policy rule value is not an array', {
             path: contextPath,
@@ -80,7 +81,7 @@ export function combineExistingMetadataPolicyOperators({
           })
         }
         const intersection = intersect(existingPolicyRuleValue, newPolicyRuleValue)
-        if (intersection.length === 0) {
+        if (intersection.length === 0 && operator.mergeStrategy === MetadataMergeStrategy.Intersection) {
           throw new PolicyOperatorMergeError('Intersection is empty', {
             path: contextPath,
             operatorA: existingPolicyRules,
@@ -92,7 +93,7 @@ export function combineExistingMetadataPolicyOperators({
 
         break
       }
-      case MetadataMergeStrategy.SuperiorFollowsIfTrue:
+      case MetadataMergeStrategy.LogicalOr:
         if (typeof existingPolicyRuleValue !== 'boolean' || typeof newPolicyRuleValue !== 'boolean') {
           throw new PolicyOperatorMergeError('Existing policy rule value is not a boolean', {
             path: contextPath,
@@ -100,7 +101,7 @@ export function combineExistingMetadataPolicyOperators({
             operatorB: newPolicyRules,
           })
         }
-        combinedPolicyRules[policyPropertyKey] = existingPolicyRuleValue ?? newPolicyRuleValue
+        combinedPolicyRules[policyPropertyKey] = existingPolicyRuleValue || newPolicyRuleValue
         break
 
       default:

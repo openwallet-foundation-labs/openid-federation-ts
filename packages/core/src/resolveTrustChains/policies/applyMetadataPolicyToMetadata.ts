@@ -18,6 +18,9 @@ export function applyMetadataPolicyToMetadata({
   const resolvedLeafMetadata = new MetadataHelper(immutable(leafMetadata))
 
   for (const [serviceKey, service] of objectToEntries(policyMetadata)) {
+    // Section 6.1.4.2: policies apply to the entity types the metadata has, operators do not add an entity type
+    if (!resolvedLeafMetadata.hasEntityType(serviceKey)) continue
+
     for (const [servicePropertyKey, policyValue] of objectToEntries(service)) {
       const policies = objectToEntries(policyValue)
         .filter(([key]) => isExistingPolicyKey(key))
@@ -29,7 +32,17 @@ export function applyMetadataPolicyToMetadata({
 
       const path = `${serviceKey}.${servicePropertyKey}`
 
-      for (const [policyPropertyKey, valueFromPolicy] of policies) {
+      // Section 6.1.3.1.8: scope, a string of space-separated values, is processed as a string array
+      const isScope = servicePropertyKey === 'scope'
+      const scope = resolvedLeafMetadata.getPropertyValue(serviceKey, servicePropertyKey)
+      if (isScope && typeof scope === 'string') {
+        resolvedLeafMetadata.setPropertyValue(serviceKey, servicePropertyKey, splitScope(scope))
+      }
+
+      for (const [policyPropertyKey, rawValueFromPolicy] of policies) {
+        const valueFromPolicy =
+          isScope && typeof rawValueFromPolicy === 'string' ? splitScope(rawValueFromPolicy) : rawValueFromPolicy
+
         switch (policyPropertyKey) {
           case 'value':
             if (valueFromPolicy === null) {
@@ -80,6 +93,8 @@ export function applyMetadataPolicyToMetadata({
             break
           case 'subset_of': {
             const targetValue = resolvedLeafMetadata.getPropertyValue<PolicyValue>(serviceKey, servicePropertyKey)
+            // Only applies when the metadata parameter is present, essential enforces its presence
+            if (isNullOrUndefined(targetValue)) break
             if (!Array.isArray(targetValue))
               throw new PolicyValidationError('Cannot apply subset_of policy because the target is not an array', {
                 path,
@@ -93,19 +108,15 @@ export function applyMetadataPolicyToMetadata({
                 targetValue,
               })
 
+            // The intersection may be an empty array, which stays the value of the metadata parameter
             const newValue = targetValue.filter((value) => valueFromPolicy.includes(value))
-
-            if (newValue.length === 0) {
-              resolvedLeafMetadata.deleteProperty(serviceKey, servicePropertyKey)
-              break
-            }
-
             resolvedLeafMetadata.setPropertyValue(serviceKey, servicePropertyKey, newValue)
-
             break
           }
           case 'superset_of': {
             const targetValue = resolvedLeafMetadata.getPropertyValue<PolicyValue>(serviceKey, servicePropertyKey)
+            // Only applies when the metadata parameter is present, essential enforces its presence
+            if (isNullOrUndefined(targetValue)) break
             if (!Array.isArray(targetValue))
               throw new PolicyValidationError('Cannot apply superset_of policy because the target is not an array', {
                 path,
@@ -119,7 +130,7 @@ export function applyMetadataPolicyToMetadata({
                 targetValue,
               })
 
-            if (!targetValue.every((value) => valueFromPolicy.includes(value)))
+            if (!valueFromPolicy.every((value) => targetValue.includes(value)))
               throw new PolicyValidationError('The target does not contain all the values from the policy superset', {
                 path,
                 policyValue: valueFromPolicy,
@@ -137,16 +148,15 @@ export function applyMetadataPolicyToMetadata({
                 policyValue: valueFromPolicy,
                 targetValue,
               })
-
-            if (Array.isArray(targetValue) && targetValue.length === 0)
-              throw new PolicyValidationError('The target is empty and is essential to have a value', {
-                path,
-                policyValue: valueFromPolicy,
-                targetValue,
-              })
+            // An empty array, for example after subset_of, is present (Section 6.1.3.1.8, Table 1)
             break
           }
         }
+      }
+
+      const resolvedScope = resolvedLeafMetadata.getPropertyValue(serviceKey, servicePropertyKey)
+      if (isScope && Array.isArray(resolvedScope)) {
+        resolvedLeafMetadata.setPropertyValue(serviceKey, servicePropertyKey, resolvedScope.join(' '))
       }
     }
   }
@@ -155,3 +165,5 @@ export function applyMetadataPolicyToMetadata({
     resolvedLeafMetadata: resolvedLeafMetadata.asMetadata(),
   }
 }
+
+const splitScope = (scope: string) => scope.split(' ').filter((value) => value !== '')

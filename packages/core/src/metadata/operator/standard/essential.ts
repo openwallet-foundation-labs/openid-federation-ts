@@ -16,5 +16,5 @@ export const essentialOperator = createPolicyOperatorSchema({
   operatorJsonValues: [z.boolean()],
   canBeCombinedWith: ['add', 'default', 'one_of', 'subset_of', 'superset_of', 'value'],
   orderOfApplication: MetadataOrderOfApplication.Last,
-  mergeStrategy: MetadataMergeStrategy.SuperiorFollowsIfTrue,
+  mergeStrategy: MetadataMergeStrategy.LogicalOr,
 })

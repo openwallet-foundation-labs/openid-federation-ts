@@ -69,9 +69,8 @@ describe('policy merge', () => {
     })
   })
 
-  // superset_of
-
-  it('it should fail the subset_of policy rules', () => {
+  // Section 6.1.3.1.5 subset_of: "Note that the resulting intersection may thus be an empty array []."
+  it('it should combine subset_of policy rules without common values to an empty array', () => {
     const superiorPolicyRule = {
       subset_of: ['one', 'two'],
     } as const
@@ -80,14 +79,18 @@ describe('policy merge', () => {
       subset_of: ['three'],
     } as const
 
-    assert.throws(() =>
-      combineExistingMetadataPolicyOperators({
-        contextPath: 'openid_relying_party.contacts',
-        existingPolicyRules: superiorPolicyRule,
-        newPolicyRules: policyRule,
-      })
-    )
+    const combinedPolicyRules = combineExistingMetadataPolicyOperators({
+      contextPath: 'openid_relying_party.contacts',
+      existingPolicyRules: superiorPolicyRule,
+      newPolicyRules: policyRule,
+    })
+
+    assert.deepStrictEqual(combinedPolicyRules, {
+      subset_of: [],
+    })
   })
+
+  // superset_of
 
   it('it should combine the superset_of policy rules', () => {
     const superiorPolicyRule = {

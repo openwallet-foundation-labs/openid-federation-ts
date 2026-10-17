@@ -18,9 +18,20 @@ export enum MetadataMergeStrategy {
    */
   Intersection = 2,
   /**
-   *
-   * If a Superior has specified essential=true, then a Subordinate MUST NOT change that. If a Superior has specified essential=false, then a Subordinate is allowed to change that to essential=true. If a Superior has not specified essential, then a Subordinate can set essential to true or false. If those conditions are not met, this MUST result in a policy error.
-   *
+   * @deprecated use {@link MetadataMergeStrategy.LogicalOr}, which `essential` uses in OpenID Federation 1.0.
    */
   SuperiorFollowsIfTrue = 3,
+  /**
+   *
+   * The result of merging the values of two these operators is the logical disjunction (OR) of the operator values.
+   * Declared after the deprecated alias, so that the reverse mapping of 3 is 'LogicalOr'.
+   *
+   */
+  LogicalOr = 3,
+  /**
+   *
+   * The result of merging the values of two these operators is the intersection of the operator values. The intersection may be an empty array.
+   *
+   */
+  IntersectionMayBeEmpty = 4,
 }

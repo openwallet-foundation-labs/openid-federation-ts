@@ -17,7 +17,7 @@ export const supersetOfOperator = createPolicyOperatorSchema({
     // z.array(z.record(z.string().or(z.number()), z.unknown())),
     z.array(z.number()),
   ],
-  canBeCombinedWith: ['add', 'default', 'subset_of', 'essential'],
+  canBeCombinedWith: ['value', 'add', 'default', 'subset_of', 'essential'],
   orderOfApplication: MetadataOrderOfApplication.AfterSubsetOf,
   mergeStrategy: MetadataMergeStrategy.Union,
 })

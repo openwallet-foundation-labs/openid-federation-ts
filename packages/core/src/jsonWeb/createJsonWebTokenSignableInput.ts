@@ -1,5 +1,5 @@
 import { Buffer } from 'buffer'
-import { base64ToBase64URL } from '../utils/encoding'
+import { base64ToBase64URL, stringifyJwtPart } from '../utils/encoding'
 
 /**
  *
@@ -15,8 +15,8 @@ export const createJwtSignableInput = (header: Record<string, unknown>, payload:
     throw new Error('Can not create JWT with an empty payload')
   }
 
-  const encodedHeader = base64ToBase64URL(Buffer.from(JSON.stringify(header)).toString('base64'))
-  const encodedPayload = base64ToBase64URL(Buffer.from(JSON.stringify(payload)).toString('base64'))
+  const encodedHeader = base64ToBase64URL(Buffer.from(stringifyJwtPart(header)).toString('base64'))
+  const encodedPayload = base64ToBase64URL(Buffer.from(stringifyJwtPart(payload)).toString('base64'))
 
   const toBeSignedString = `${encodedHeader}.${encodedPayload}`
 

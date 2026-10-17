@@ -8,6 +8,7 @@ import type { SignCallback, VerifyCallback } from '../src/utils'
 
 import assert from 'node:assert/strict'
 import nock from 'nock'
+import { dateInSeconds } from './utils/dateInSeconds'
 
 describe('fetch entity configuration', () => {
   const verifyJwtCallback: VerifyCallback = () => Promise.resolve(true)
@@ -20,8 +21,8 @@ describe('fetch entity configuration', () => {
     const claims = {
       iss: entityId,
       sub: entityId,
-      iat: new Date(),
-      exp: new Date(),
+      iat: dateInSeconds(),
+      exp: dateInSeconds(),
       jwks: { keys: [{ kid: 'a', kty: 'EC' }] },
     }
 
@@ -51,8 +52,8 @@ describe('fetch entity configuration', () => {
     const claims = {
       iss: entityId,
       sub: entityId,
-      iat: new Date(),
-      exp: new Date(),
+      iat: dateInSeconds(),
+      exp: dateInSeconds(),
       metadata: {
         openid_relying_party: {
           client_name: 'bakfiets',
@@ -88,8 +89,8 @@ describe('fetch entity configuration', () => {
     const claims = {
       iss: entityId,
       sub: entityId,
-      iat: new Date(),
-      exp: new Date(),
+      iat: dateInSeconds(),
+      exp: dateInSeconds(),
       jwks: { keys: [{ kid: 'a', kty: 'EC' }] },
     }
 

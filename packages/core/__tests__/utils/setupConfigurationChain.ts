@@ -7,6 +7,7 @@ import {
 import { type EntityStatementClaimsOptions, createEntityStatement } from '../../src/entityStatement'
 import type { JsonWebKeySetOptions } from '../../src/jsonWeb'
 import type { SignCallback } from '../../src/utils'
+import { dateInSeconds } from './dateInSeconds'
 
 type SubordinateOptions = {
   entityId: string
@@ -60,8 +61,8 @@ export const setupConfigurationChain = async <MockEndpoints extends boolean>(
     const claims: EntityConfigurationClaimsOptions = {
       iss: entityId,
       sub: entityId,
-      exp: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30), // 30 days
-      iat: new Date(),
+      exp: dateInSeconds(1000 * 60 * 60 * 24 * 30), // 30 days
+      iat: dateInSeconds(),
       jwks: jwks ?? { keys: [{ kid: 'a', kty: 'EC' }] },
       authority_hints: authorityHints,
       ...givenClaims,
@@ -100,11 +101,14 @@ export const setupConfigurationChain = async <MockEndpoints extends boolean>(
     for (const sub of subordinates ?? []) {
       const givenClaims = typeof sub === 'string' ? { sub } : { sub: sub.entityId, ...sub.claims }
 
+      // A subordinate statement lists the subject's federation keys
       const subordinateClaims = {
-        jwks: { keys: [] },
+        jwks: chainOptions.find((options) => options.entityId === givenClaims.sub)?.jwks ?? {
+          keys: [{ kid: 'a', kty: 'EC' }],
+        },
         iss: entityId,
-        exp: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30), // 30 days
-        iat: new Date(),
+        exp: dateInSeconds(1000 * 60 * 60 * 24 * 30), // 30 days
+        iat: dateInSeconds(),
         ...givenClaims,
       }
 
@@ -119,7 +123,6 @@ export const setupConfigurationChain = async <MockEndpoints extends boolean>(
           .get('')
           .query({
             sub: subordinateClaims.sub,
-            iss: entityId,
           })
           .reply(200, entityStatementJwt, {
             'content-type': 'application/entity-statement+jwt',
