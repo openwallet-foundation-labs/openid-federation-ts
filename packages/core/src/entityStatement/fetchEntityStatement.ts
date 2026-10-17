@@ -1,6 +1,8 @@
 import { type EntityConfigurationClaims, fetchEntityConfiguration } from '../entityConfiguration'
+import { OpenIdFederationError } from '../error/OpenIdFederationError'
+import { PolicyErrorStage } from '../error/PolicyErrorStage'
 import { verifyJwtSignature } from '../jsonWeb/verifyJsonWebToken'
-import { type FetchCallback, type VerifyCallback, fetcher } from '../utils'
+import { type FetchCallback, type VerifyCallback, fetcher, isSameEntityId } from '../utils'
 import { validate } from '../utils/validate'
 import { entityStatementJwtSchema } from './entityStatementJwt'
 
@@ -46,7 +48,7 @@ export const fetchEntityStatement = async ({
 
   const entityStatementJwt = await fetcher.get({
     url: fetchEndpoint,
-    searchParams: { iss, sub },
+    searchParams: { sub },
     requiredContentType: 'application/entity-statement+jwt',
     fetchCallback,
   })
@@ -57,6 +59,13 @@ export const fetchEntityStatement = async ({
     data: entityStatementJwt,
     errorMessage: 'fetched entity statement JWT is invalid',
   })
+
+  if (!isSameEntityId(claims.iss, iss) || !isSameEntityId(claims.sub, sub)) {
+    throw new OpenIdFederationError(
+      PolicyErrorStage.Validation,
+      `entity statement fetched for issuer '${iss}' and subject '${sub}' has issuer '${claims.iss}' and subject '${claims.sub}'`
+    )
+  }
 
   await verifyJwtSignature({
     verifyJwtCallback,

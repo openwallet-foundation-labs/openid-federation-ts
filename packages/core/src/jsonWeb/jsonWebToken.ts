@@ -68,6 +68,7 @@ export const jsonWebTokenSchema = <
     })
 
     return {
+      jwt: s,
       header: validatedHeader,
       claims: validatedClaims,
       signature: new Uint8Array(decodedSignature),
