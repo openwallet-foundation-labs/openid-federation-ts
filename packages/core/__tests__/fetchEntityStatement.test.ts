@@ -5,6 +5,7 @@ import { createEntityConfiguration, fetchEntityConfiguration } from '../src/enti
 import { createEntityStatement } from '../src/entityStatement/createEntityStatement'
 import { fetchEntityStatement } from '../src/entityStatement/fetchEntityStatement'
 import type { SignCallback, VerifyCallback } from '../src/utils'
+import { dateInSeconds } from './utils/dateInSeconds'
 
 describe('fetch entity statement', () => {
   const signJwtCallback: SignCallback = () => Promise.resolve(new Uint8Array(10).fill(42))
@@ -37,8 +38,8 @@ describe('fetch entity statement', () => {
     })
 
     const entityStatementClaims = {
-      exp: new Date(),
-      iat: new Date(),
+      exp: dateInSeconds(),
+      iat: dateInSeconds(),
       iss,
       sub,
       jwks: { keys: [{ kty: 'EC', kid: 'b' }] },
@@ -109,8 +110,8 @@ describe('fetch entity statement', () => {
     })
 
     const entityStatementClaims = {
-      exp: new Date(),
-      iat: new Date(),
+      exp: dateInSeconds(),
+      iat: dateInSeconds(),
       iss,
       sub,
       jwks: { keys: [{ kty: 'EC', kid: 'b' }] },
@@ -175,8 +176,8 @@ describe('fetch entity statement', () => {
     })
 
     const entityStatementClaims = {
-      exp: new Date(),
-      iat: new Date(),
+      exp: dateInSeconds(),
+      iat: dateInSeconds(),
       iss,
       sub,
       jwks: { keys: [{ kty: 'EC', kid: 'b' }] },
@@ -326,8 +327,8 @@ describe('fetch entity statement', () => {
     })
 
     const entityStatementClaims = {
-      exp: new Date(),
-      iat: new Date(),
+      exp: dateInSeconds(),
+      iat: dateInSeconds(),
       iss,
       sub,
       jwks: { keys: [{ kty: 'EC', kid: 'b' }] },

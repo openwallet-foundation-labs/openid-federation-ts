@@ -6,10 +6,16 @@ import { metadataPolicySchema } from '../../policy'
 export const createEntity = <T extends string, S extends z.ZodRawShape>({
   identifier,
   additionalValidation = {} as S,
-  passThroughUnknownProperties = false,
+  passThroughUnknownProperties = true,
 }: {
   identifier: T
   additionalValidation?: S
+  /**
+   * Keep metadata parameters the schema does not define, for example the protocol specific
+   * parameters of `oauth_authorization_server`. Dropping them would remove them from the resolved metadata.
+   *
+   * @default true
+   */
   passThroughUnknownProperties?: boolean
 }) => {
   const schema = commonMetadataSchema.extend(additionalValidation)

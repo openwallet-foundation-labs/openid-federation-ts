@@ -4,12 +4,11 @@ import { describe, it } from 'node:test'
 import { constraintSchema } from '../src/constraints'
 import { entityConfigurationClaimsSchema } from '../src/entityConfiguration'
 import { entityStatementClaimsSchema } from '../src/entityStatement'
-import { metadataSchema } from '../src/metadata/metadata'
 import { trustMarkClaimsSchema } from '../src/trustMark'
 import { trustMarkIssuerSchema } from '../src/trustMark'
 import { trustMarkOwnerSchema } from '../src/trustMark'
 
-import { federationEntityMetadata } from '../src/metadata'
+import { federationEntityMetadata, openIdProviderEntityMetadata } from '../src/metadata'
 import { metadataPolicySchema } from '../src/metadata/metadataPolicy'
 import { validate } from '../src/utils/validate'
 import { constraintsFigure17 } from './fixtures/constraintsFigure17'
@@ -244,7 +243,7 @@ describe('zod validation schemas', () => {
     })
 
     it('should validate figure 63 -- metadata', () => {
-      assert.doesNotThrow(() => validate({ schema: metadataSchema, data: metadataFigure63 }))
+      assert.doesNotThrow(() => validate({ schema: openIdProviderEntityMetadata.schema, data: metadataFigure63 }))
     })
 
     it('should validate figure 69 -- entity configuration', () => {

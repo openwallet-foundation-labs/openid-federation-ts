@@ -7,6 +7,7 @@ import nock from 'nock'
 import { createEntityConfiguration, fetchEntityConfiguration } from '../src/entityConfiguration'
 import { createEntityStatement, fetchEntityStatement } from '../src/entityStatement'
 import type { SignCallback, VerifyCallback } from '../src/utils'
+import { dateInSeconds } from './utils/dateInSeconds'
 
 describe('End To End', async () => {
   const key = await subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, ['sign', 'verify'])
@@ -35,8 +36,8 @@ describe('End To End', async () => {
     const claims = {
       iss,
       sub: iss,
-      exp: new Date(),
-      iat: new Date(),
+      exp: dateInSeconds(),
+      iat: dateInSeconds(),
       jwks: {
         keys: [publicKeyJwk],
       },
@@ -74,8 +75,8 @@ describe('End To End', async () => {
       claims: {
         iss,
         sub: iss,
-        exp: new Date(),
-        iat: new Date(),
+        exp: dateInSeconds(),
+        iat: dateInSeconds(),
         jwks: {
           keys: [publicKeyJwk],
         },
@@ -94,8 +95,8 @@ describe('End To End', async () => {
     const entityStamentClaims = {
       iss,
       sub: iss,
-      exp: new Date(),
-      iat: new Date(),
+      exp: dateInSeconds(),
+      iat: dateInSeconds(),
       jwks: {
         keys: [],
       },

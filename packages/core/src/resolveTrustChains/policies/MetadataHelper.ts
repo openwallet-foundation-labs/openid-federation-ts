@@ -2,7 +2,11 @@ import type { Metadata } from '../../metadata'
 import type { MetadataPolicy } from '../../metadata/metadataPolicy'
 
 export class MetadataHelper {
-  public constructor(private leafMetadata: Record<string, Record<string, unknown>>) {}
+  private leafMetadata: Record<string, Record<string, unknown>>
+
+  public constructor(leafMetadata: Metadata) {
+    this.leafMetadata = leafMetadata as Record<string, Record<string, unknown>>
+  }
 
   public hasProperty(service: string, property: string) {
     return this.leafMetadata[service]?.[property] !== undefined
