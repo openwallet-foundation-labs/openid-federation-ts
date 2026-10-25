@@ -1,3 +1,11 @@
+#  ⚠️ IMPORTANT: PROJECT ARCHIVED
+Feature development in OpenID Federation - TypeScript ended in October 2026 when the maintainers decided to merge with Identity Common - TS and then migrated from OpenWallet Foundation to LF Decentralized Trust. 
+
+To follow the progress, use the code, or contribute to it, visit the Identity Common-TS Repository: [https://github.com/openwallet-foundation-labs/identity-common-ts](https://github.com/openwallet-foundation-labs/identity-common-ts) 
+
+For any questions or issues, check with the maintainers on the [LFDT Discord](https://discord.lfdecentralizedtrust.org/) or email support@lfdecentralizedtrust.org.
+---
+
 <h1 align="center" ><b>OpenID Federation</b></h1>
 
 <p align="center">
